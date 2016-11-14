@@ -1,7 +1,7 @@
 defmodule Draft do
   def to_html(input) do
-    blocks = Poison.Parser.parse!(input)["blocks"]
-    Enum.map(blocks, &process_block/1)
+    Poison.Parser.parse!(input)["blocks"]
+      |> Enum.map(&process_block/1)
       |> Enum.join("")
   end
 
