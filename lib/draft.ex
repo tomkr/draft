@@ -6,6 +6,16 @@ defmodule Draft do
   end
 
   defp process_block(%{"type" => "unstyled",
+                      "text" => "",
+                      "key" => _,
+                      "data" => _,
+                      "depth" => _,
+                      "entityRanges" => _,
+                      "inlineStyleRanges" => _}) do
+    "<br>"
+  end
+
+  defp process_block(%{"type" => "unstyled",
                       "text" => text,
                       "key" => _,
                       "data" => _,
