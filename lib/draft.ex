@@ -15,6 +15,16 @@ defmodule Draft do
     "<br>"
   end
 
+  defp process_block(%{"type" => "header-one",
+                      "text" => text,
+                      "key" => _,
+                      "data" => _,
+                      "depth" => _,
+                      "entityRanges" => _,
+                      "inlineStyleRanges" => _}) do
+    "<h1>#{text}</h1>"
+  end
+
   defp process_block(%{"type" => "unstyled",
                       "text" => text,
                       "key" => _,
