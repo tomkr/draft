@@ -15,14 +15,15 @@ defmodule Draft do
     "<br>"
   end
 
-  defp process_block(%{"type" => "header-one",
+  defp process_block(%{"type" => "header-" <> header,
                       "text" => text,
                       "key" => _,
                       "data" => _,
                       "depth" => _,
                       "entityRanges" => _,
                       "inlineStyleRanges" => _}) do
-    "<h1>#{text}</h1>"
+    tag = header_tags[header]
+    "<#{tag}>#{text}</#{tag}>"
   end
 
   defp process_block(%{"type" => "unstyled",
@@ -33,5 +34,13 @@ defmodule Draft do
                       "entityRanges" => _,
                       "inlineStyleRanges" => _}) do
     "<p>#{text}</p>"
+  end
+
+  defp header_tags do
+    %{
+      "one"   => "h1",
+      "two"   => "h2",
+      "three" => "h3"
+    }
   end
 end

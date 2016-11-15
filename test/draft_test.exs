@@ -14,6 +14,18 @@ defmodule DraftTest do
     assert Draft.to_html(input) == output
   end
 
+  test "generate a <h2>" do
+    input = ~s({"entityMap":{},"blocks":[{"key":"9d21d","text":"Hello","type":"header-two","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}]})
+    output = "<h2>Hello</h2>"
+    assert Draft.to_html(input) == output
+  end
+
+  test "generate a <h3>" do
+    input = ~s({"entityMap":{},"blocks":[{"key":"9d21d","text":"Hello","type":"header-three","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}]})
+    output = "<h3>Hello</h3>"
+    assert Draft.to_html(input) == output
+  end
+
   test "generate a <br>" do
     input = ~s({"entityMap":{},"blocks":[{"key":"9d21d","text":"","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}]})
     output = "<br>"
