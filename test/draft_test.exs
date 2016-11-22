@@ -26,6 +26,12 @@ defmodule DraftTest do
     assert Draft.to_html(input) == output
   end
 
+  test "generate a <blockquote>" do
+    input = ~s({"entityMap":{},"blocks":[{"key":"9d21d","text":"Hello","type":"blockquote","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}]})
+    output = "<blockquote>Hello</blockquote>"
+    assert Draft.to_html(input) == output
+  end
+
   test "generate a <br>" do
     input = ~s({"entityMap":{},"blocks":[{"key":"9d21d","text":"","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}]})
     output = "<br>"

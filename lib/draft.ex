@@ -26,6 +26,16 @@ defmodule Draft do
     "<#{tag}>#{text}</#{tag}>"
   end
 
+  defp process_block(%{"type" => "blockquote",
+                      "text" => text,
+                      "key" => _,
+                      "data" => _,
+                      "depth" => _,
+                      "entityRanges" => _,
+                      "inlineStyleRanges" => _}) do
+    "<blockquote>#{text}</blockquote>"
+  end
+
   defp process_block(%{"type" => "unstyled",
                       "text" => text,
                       "key" => _,
