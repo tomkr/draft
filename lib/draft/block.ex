@@ -13,7 +13,7 @@ defmodule Draft.Block do
                           "data" => _,
                           "depth" => _,
                           "entityRanges" => _,
-                          "inlineStyleRanges" => _}, _) do
+                          "inlineStyleRanges" => _}, _, _) do
         "<br>"
       end
 
@@ -24,7 +24,7 @@ defmodule Draft.Block do
                           "depth" => _,
                           "entityRanges" => entity_ranges,
                           "inlineStyleRanges" => inline_style_ranges},
-                        entity_map) do
+                        entity_map, _) do
         tag = header_tags[header]
         "<#{tag}>#{apply_ranges(text, inline_style_ranges, entity_ranges, entity_map)}</#{tag}>"
       end
@@ -36,7 +36,7 @@ defmodule Draft.Block do
                           "depth" => _,
                           "entityRanges" => entity_ranges,
                           "inlineStyleRanges" => inline_style_ranges},
-                        entity_map) do
+                        entity_map, _) do
         "<blockquote>#{apply_ranges(text, inline_style_ranges, entity_ranges, entity_map)}</blockquote>"
       end
 
@@ -47,7 +47,7 @@ defmodule Draft.Block do
                           "depth" => _,
                           "entityRanges" => entity_ranges,
                           "inlineStyleRanges" => inline_style_ranges},
-                        entity_map) do
+                        entity_map, _) do
         "<p>#{apply_ranges(text, inline_style_ranges, entity_ranges, entity_map)}</p>"
       end
 
