@@ -12,9 +12,11 @@ defmodule Draft do
       "<p>Hello</p>"
   """
   def to_html(input) do
+    entity_map = Map.get(input, "entityMap")
+
     input
       |> Map.get("blocks")
-      |> Enum.map(&Draft.Block.to_html/1)
+      |> Enum.map(&(Draft.Block.to_html(&1, entity_map)))
       |> Enum.join("")
   end
 end
