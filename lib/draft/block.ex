@@ -24,9 +24,9 @@ defmodule Draft.Block do
                           "depth" => _,
                           "entityRanges" => entity_ranges,
                           "inlineStyleRanges" => inline_style_ranges},
-                        entity_map, _) do
+                        entity_map, context) do
         tag = header_tags[header]
-        "<#{tag}>#{apply_ranges(text, inline_style_ranges, entity_ranges, entity_map)}</#{tag}>"
+        "<#{tag}>#{apply_ranges(text, inline_style_ranges, entity_ranges, entity_map, context)}</#{tag}>"
       end
 
       def process_block(%{"type" => "blockquote",
@@ -36,8 +36,8 @@ defmodule Draft.Block do
                           "depth" => _,
                           "entityRanges" => entity_ranges,
                           "inlineStyleRanges" => inline_style_ranges},
-                        entity_map, _) do
-        "<blockquote>#{apply_ranges(text, inline_style_ranges, entity_ranges, entity_map)}</blockquote>"
+                        entity_map, context) do
+        "<blockquote>#{apply_ranges(text, inline_style_ranges, entity_ranges, entity_map, context)}</blockquote>"
       end
 
       def process_block(%{"type" => "unstyled",
@@ -47,8 +47,8 @@ defmodule Draft.Block do
                           "depth" => _,
                           "entityRanges" => entity_ranges,
                           "inlineStyleRanges" => inline_style_ranges},
-                        entity_map, _) do
-        "<p>#{apply_ranges(text, inline_style_ranges, entity_ranges, entity_map)}</p>"
+                        entity_map, context) do
+        "<p>#{apply_ranges(text, inline_style_ranges, entity_ranges, entity_map, context)}</p>"
       end
 
       def header_tags do
