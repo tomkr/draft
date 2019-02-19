@@ -7,7 +7,7 @@ Draft is a module that parses a JSON representation of [Draft.js](https://facebo
 You can `use Draft` in your module, and then extend it with custom 
 `process_block`, `process_style`, and `process_entity` function signatures
 
-```
+```elixir
   # define your draft module
   defmodule MyCustomDraft do
     use Draft
@@ -51,7 +51,7 @@ You can `use Draft` in your module, and then extend it with custom
 You can pass a third variable for context that your custom processors can hook 
 into.
 
-```
+```elixir
   # capture the relevant context vars in your custom processors
   defmodule MyCustomDraft do
     use Draft
