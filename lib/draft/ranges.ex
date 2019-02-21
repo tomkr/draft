@@ -54,13 +54,13 @@ defmodule Draft.Ranges do
       defp get_entity_opening_tags_for_start(start, entity_ranges, entity_map, context) do
         entity_ranges
         |> Enum.filter(fn range -> range["offset"] === start end)
-        |> Enum.map(fn range -> Map.get(entity_map, range["key"]) |> process_entity(context) |> elem(0) end)
+        |> Enum.map(fn range -> Map.get(entity_map, Integer.to_string(range["key"])) |> process_entity(context) |> elem(0) end)
       end
 
       defp get_entity_closing_tags_for_finish(finish, entity_ranges, entity_map, context) do
         entity_ranges
         |> Enum.filter(fn range -> range["offset"] + range["length"] === finish end)
-        |> Enum.map(fn range -> Map.get(entity_map, range["key"]) |> process_entity(context) |> elem(1) end)
+        |> Enum.map(fn range -> Map.get(entity_map, Integer.to_string(range["key"])) |> process_entity(context) |> elem(1) end)
         |> Enum.reverse()
       end
 
