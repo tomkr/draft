@@ -87,4 +87,37 @@ defmodule DraftTest do
     output = "<p><span style=\"font-style: italic;\">He</span><a href=\"http://google.com\"><span style=\"font-style: italic;\">ll</span><span style=\"font-weight: bold;\">o</span></a><span style=\"font-weight: bold;\"> Wo</span>rld!</p>"
     assert to_html(input) == output
   end
+
+  test "wraps ordered lists in <ol>" do
+    input = %{"entityMap"=>%{},"blocks"=>[%{"key"=>"9d21d","text"=>"one","type"=>"ordered-list-item","depth"=>0,"inlineStyleRanges"=>[],"entityRanges"=>[],"data"=>%{}}]}
+    output = "<ol><li>one</li></ol>"
+    assert to_html(input) == output
+  end
+
+  test "wraps unordered lists in <ul>" do
+    input = %{"entityMap"=>%{},"blocks"=>[%{"key"=>"9d21d","text"=>"one","type"=>"unordered-list-item","depth"=>0,"inlineStyleRanges"=>[],"entityRanges"=>[],"data"=>%{}}]}
+    output = "<ul><li>one</li></ul>"
+    assert to_html(input) == output
+  end
+
+  test "wraps multiple unordered list items in the same <ul>" do
+    input = %{"entityMap"=>%{},"blocks"=>[
+               %{"key"=>"9d21d","text"=>"one","type"=>"unordered-list-item","depth"=>0,"inlineStyleRanges"=>[],"entityRanges"=>[],"data"=>%{}},
+               %{"key"=>"9d21e","text"=>"two","type"=>"unordered-list-item","depth"=>0,"inlineStyleRanges"=>[],"entityRanges"=>[],"data"=>%{}}
+             ]}
+    output = "<ul><li>one</li><li>two</li></ul>"
+    assert to_html(input) == output
+  end
+
+  test "wraps multiple complex lists" do
+    input = %{"entityMap"=>%{},"blocks"=>[
+               %{"key"=>"9d21c","text"=>"one","type"=>"unordered-list-item","depth"=>0,"inlineStyleRanges"=>[],"entityRanges"=>[],"data"=>%{}},
+               %{"key"=>"9d21e","text"=>"whoops","type"=>"ordered-list-item","depth"=>0,"inlineStyleRanges"=>[],"entityRanges"=>[],"data"=>%{}},
+               %{"key"=>"9d21d","text"=>"two","type"=>"unordered-list-item","depth"=>0,"inlineStyleRanges"=>[],"entityRanges"=>[],"data"=>%{}},
+               %{"key"=>"9d21f","text"=>"Hello","type"=>"unstyled","depth"=>0,"inlineStyleRanges"=>[],"entityRanges"=>[],"data"=>%{}},
+               %{"key"=>"9d21g","text"=>"and another","type"=>"ordered-list-item","depth"=>0,"inlineStyleRanges"=>[],"entityRanges"=>[],"data"=>%{}}
+             ]}
+    output = "<ul><li>one</li></ul><ol><li>whoops</li></ol><ul><li>two</li></ul><p>Hello</p><ol><li>and another</li></ol>"
+    assert to_html(input) == output
+  end
 end
