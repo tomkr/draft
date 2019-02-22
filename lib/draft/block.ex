@@ -51,6 +51,40 @@ defmodule Draft.Block do
         "<p>#{apply_ranges(text, inline_style_ranges, entity_ranges, entity_map, context)}</p>"
       end
 
+      def process_block(%{"type" => "unordered-list",
+                          "data" => %{"children" => children}},
+        entity_map, context) do
+        "<ul>#{Enum.map(children, &(process_block(&1, entity_map, context))) |> Enum.join("")}</ul>"
+      end
+
+      def process_block(%{"type" => "ordered-list",
+                          "data" => %{"children" => children}},
+        entity_map, context) do
+        "<ol>#{Enum.map(children, &(process_block(&1, entity_map, context))) |> Enum.join("")}</ol>"
+      end
+
+      def process_block(%{"type" => "ordered-list-item",
+                          "text" => text,
+                          "key" => _,
+                          "data" => _,
+                          "depth" => _,
+                          "entityRanges" => entity_ranges,
+                          "inlineStyleRanges" => inline_style_ranges},
+        entity_map, context) do
+        "<li>#{apply_ranges(text, inline_style_ranges, entity_ranges, entity_map, context)}</li>"
+      end
+
+      def process_block(%{"type" => "unordered-list-item",
+                          "text" => text,
+                          "key" => _,
+                          "data" => _,
+                          "depth" => _,
+                          "entityRanges" => entity_ranges,
+                          "inlineStyleRanges" => inline_style_ranges},
+        entity_map, context) do
+        "<li>#{apply_ranges(text, inline_style_ranges, entity_ranges, entity_map, context)}</li>"
+      end
+
       def header_tags do
         %{
           "one"   => "h1",
