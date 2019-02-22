@@ -21,7 +21,7 @@ defmodule Draft do
 
         input
         |> Map.get("blocks")
-        |> Enum.reduce([], group_list_items())
+        |> Enum.reduce([], &group_list_items/2)
         |> Enum.map(&(process_block(&1, entity_map, context)))
         |> Enum.join("")
       end
