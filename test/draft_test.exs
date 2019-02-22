@@ -63,7 +63,7 @@ defmodule DraftTest do
   end
 
   test "wraps anchor entities" do
-    input = %{"entityMap"=>%{0=>%{"type"=>"LINK","mutability"=>"MUTABLE","data"=>%{"url"=>"http://google.com"}}},
+    input = %{"entityMap"=>%{"0"=>%{"type"=>"LINK","mutability"=>"MUTABLE","data"=>%{"url"=>"http://google.com"}}},
               "blocks"=>[%{"text"=>"Hello World!","inlineStyleRanges"=>[],"type"=>"unstyled","depth"=>0,"entityRanges"=>[
                             %{"offset"=>2,"length"=>3,"key"=>0}
                           ],"data"=>%{},"key"=>"9d21d"}]}
@@ -72,7 +72,7 @@ defmodule DraftTest do
   end
 
   test "wraps overlapping entities and inline styles" do
-    input = %{"entityMap"=>%{0=>%{"type"=>"LINK","mutability"=>"MUTABLE","data"=>%{"url"=>"http://google.com"}}},
+    input = %{"entityMap"=>%{"0"=>%{"type"=>"LINK","mutability"=>"MUTABLE","data"=>%{"url"=>"http://google.com"}}},
               "blocks"=>[%{"text"=>"Hello World!",
                            "inlineStyleRanges"=>[
                              %{"style"=>"ITALIC","offset"=>0,"length"=>4},
