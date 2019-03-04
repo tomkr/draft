@@ -5,30 +5,28 @@ defmodule Draft.Ranges do
       Provides functions for adding inline style ranges and entity ranges
       """
 
-      def apply_ranges(text, inline_style_ranges, entity_ranges, entity_map, context) do
-        inline_style_ranges ++ entity_ranges
-        |> consolidate_ranges()
-        |> Enum.reduce(text, fn {start, finish}, acc ->
-          {style_opening_tag, style_closing_tag} =
-            case get_styles_for_range(start, finish, inline_style_ranges, context) do
-              "" -> {"", ""}
-              styles -> {"<span style=\"#{styles}\">", "</span>"}
-            end
-          entity_opening_tags = get_entity_opening_tags_for_start(start, entity_ranges, entity_map, context)
-          entity_closing_tags = get_entity_closing_tags_for_finish(finish, entity_ranges, entity_map, context)
-          opening_tags = "#{entity_opening_tags}#{style_opening_tag}"
-          closing_tags = "#{style_closing_tag}#{entity_closing_tags}"
+      def apply_ranges(block, entity_map, context) do
+        block["inlineStyleRanges"]
+        |> divvy_style_ranges(block["entityRanges"])
+        |> group_style_ranges()
+        |> Kernel.++(block["entityRanges"])
+        |> sort_by_offset_and_length_then_styles_first()
+        |> DraftTree.build_tree(block["text"])
+        |> DraftTree.process_tree(fn text, styles, key ->
+          cond do
+            !is_nil(styles) ->
+              css = styles
+              |> Enum.map(fn style -> process_style(style, context) end)
+              |> Enum.join(" ")
 
-          adjusted_start = start + String.length(acc) - String.length(text)
-          adjusted_finish = finish + String.length(acc) - String.length(text)
+              "<span style=\"#{css}\">#{text}</span>"
 
-          acc
-          |> String.split_at(adjusted_finish)
-          |> Tuple.to_list
-          |> Enum.join(closing_tags)
-          |> String.split_at(adjusted_start)
-          |> Tuple.to_list
-          |> Enum.join(opening_tags)
+            !is_nil(key) ->
+              process_entity(entity_map |> Map.get(Integer.to_string(key)), text, context)
+
+            true ->
+              text
+          end
         end)
       end
 
@@ -40,63 +38,54 @@ defmodule Draft.Ranges do
         "font-style: italic;"
       end
 
-      def process_entity(%{"type"=>"LINK","mutability"=>"MUTABLE","data"=>%{"url"=>url}}, _) do
-        {"<a href=\"#{url}\">", "</a>"}
+      def process_entity(%{"type"=>"LINK","mutability"=>"MUTABLE","data"=>%{"url"=>url}}, text, _) do
+        "<a href=\"#{url}\">#{text}</a>"
       end
 
-      defp get_styles_for_range(start, finish, inline_style_ranges, context) do
-        inline_style_ranges
-        |> Enum.filter(fn range -> is_in_range(range, start, finish) end)
-        |> Enum.map(fn range -> process_style(range["style"], context) end)
-        |> Enum.join(" ")
-      end
-
-      defp get_entity_opening_tags_for_start(start, entity_ranges, entity_map, context) do
-        entity_ranges
-        |> Enum.filter(fn range -> range["offset"] === start end)
-        |> Enum.map(fn range -> Map.get(entity_map, Integer.to_string(range["key"])) |> process_entity(context) |> elem(0) end)
-      end
-
-      defp get_entity_closing_tags_for_finish(finish, entity_ranges, entity_map, context) do
-        entity_ranges
-        |> Enum.filter(fn range -> range["offset"] + range["length"] === finish end)
-        |> Enum.map(fn range -> Map.get(entity_map, Integer.to_string(range["key"])) |> process_entity(context) |> elem(1) end)
-        |> Enum.reverse()
-      end
-
-      defp is_in_range(range, start, finish) do
-        range_start = range["offset"]
-        range_finish = range["offset"] + range["length"]
-
-        start >= range_start && finish <= range_finish
+      defp group_style_ranges(ranges) do
+        ranges
+        |> Enum.group_by(fn range -> {range["offset"], range["length"]} end)
+        |> Enum.map(fn {{offset, length}, ranges} ->
+          %{"offset" => offset,
+            "length" => length,
+            "styles" => ranges |> Enum.map(&(&1["style"]))}
+        end)
       end
 
       @doc """
-      Takes multiple potentially overlapping ranges and breaks them into other mutually exclusive
-      ranges, so we can take each mini-range and add the specified, potentially multiple, styles
-      and entities to each mini-range
-
-      ## Examples
-          iex> ranges = [
-            %{"offset" => 0, "length" => 4, "style" => "ITALIC"},
-            %{"offset" => 4, "length" => 4, "style" => "BOLD"},
-            %{"offset" => 2, "length" => 3, "key" => 0}]
-          iex> consolidate_ranges(ranges)
-          [{0, 2}, {2, 4}, {4, 5}, {5, 8}]
+      Cuts up multiple potentially overlapping ranges into more mutually exclusive ranges
       """
-      defp consolidate_ranges(ranges) do
-        ranges
-        |> ranges_to_points()
-        |> points_to_ranges()
+      defp divvy_style_ranges(style_ranges, entity_ranges) do
+        Enum.map(style_ranges, fn style_range ->
+          ranges_to_points(entity_ranges ++ style_ranges)
+          |> Enum.filter(fn point ->
+            point > style_range["offset"] && point < style_range["offset"] + style_range["length"]
+          end)
+          |> Enum.reduce([style_range], fn point, acc ->
+            {already_split, [main]} = Enum.split(acc, length(acc) - 1)
+
+            already_split ++ [
+              %{"style" => style_range["style"],
+                "offset" => main["offset"],
+                "length" => point - main["offset"]},
+              %{"style" => style_range["style"],
+                "offset" => point,
+                "length" => main["length"] - (point - main["offset"])}]
+          end)
+        end)
+        |> List.flatten()
       end
 
-      defp points_to_ranges(points) do
-        points
-        |> Enum.with_index
-        |> Enum.reduce([], fn {point, index}, acc ->
-          case Enum.at(points, index + 1) do
-            nil -> acc
-            next -> acc ++ [{point, next}]
+      defp sort_by_offset_and_length_then_styles_first(ranges) do
+        ranges
+        |> Enum.sort(fn range1, range2 ->
+          cond do
+            range1["offset"] != range2["offset"] ->
+              range1["offset"] < range2["offset"]
+            range1["length"] != range2["length"] ->
+              range1["length"] >= range2["length"]
+            true ->
+              is_nil(range2["styles"])
           end
         end)
       end
