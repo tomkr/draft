@@ -22,7 +22,7 @@ defmodule Draft do
         input
         |> Map.get("blocks")
         |> Enum.reduce([], &group_list_items/2)
-        |> Enum.map(&(process_block(&1, entity_map, context)))
+        |> Enum.map(&process_block(&1, entity_map, context))
         |> Enum.join("")
       end
 
@@ -37,21 +37,22 @@ defmodule Draft do
       [%{"type"=>"unordered-list","data"=>%{"children"=>[%{"key"=>"1","text"=>"Hello","type"=>"unordered-list-item","depth"=>0,"inlineStyleRanges"=>[],"entityRanges"=>[],"data"=>%{}}]}}]
       """
 
-      defp group_list_items(block, acc) do
+      def group_list_items(block, acc) do
         case block["type"] do
           type when type in ["unordered-list-item", "ordered-list-item"] ->
             list_type = String.replace(block["type"], "-item", "")
 
-            with {last_item, all_but_last_item} when not is_nil(last_item) <- List.pop_at(acc, length(acc) - 1),
-                  type when type == list_type <- Map.get(last_item, "type")
-                  #FIXME: this ignores depth
-              do
-                all_but_last_item ++ [add_block_item_to_previous_list(last_item, block)]
-              else
-                _ -> acc ++ [%{"type" => list_type,
-                              "data" => %{"children" => [block]}}]
+            # FIXME: this ignores depth
+            with {last_item, all_but_last_item} when not is_nil(last_item) <-
+                   List.pop_at(acc, length(acc) - 1),
+                 type when type == list_type <- Map.get(last_item, "type") do
+              all_but_last_item ++ [add_block_item_to_previous_list(last_item, block)]
+            else
+              _ -> acc ++ [%{"type" => list_type, "data" => %{"children" => [block]}}]
             end
-          _ -> acc ++ [block]
+
+          _ ->
+            acc ++ [block]
         end
       end
 
