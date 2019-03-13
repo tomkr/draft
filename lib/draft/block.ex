@@ -16,7 +16,7 @@ defmodule Draft.Block do
             entity_map,
             context
           ) do
-        tag = header_tags[header]
+        tag = header_tags()[header]
         "<#{tag}>#{apply_ranges(block, entity_map, context)}</#{tag}>"
       end
 

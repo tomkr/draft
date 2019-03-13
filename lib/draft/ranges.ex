@@ -58,7 +58,7 @@ defmodule Draft.Ranges do
       @doc """
       Cuts up multiple potentially overlapping ranges into more mutually exclusive ranges
       """
-      defp divvy_style_ranges(style_ranges, entity_ranges) do
+      def divvy_style_ranges(style_ranges, entity_ranges) do
         Enum.map(style_ranges, fn style_range ->
           ranges_to_points(entity_ranges ++ style_ranges)
           |> Enum.filter(fn point ->

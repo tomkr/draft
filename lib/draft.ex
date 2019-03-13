@@ -37,7 +37,7 @@ defmodule Draft do
       [%{"type"=>"unordered-list","data"=>%{"children"=>[%{"key"=>"1","text"=>"Hello","type"=>"unordered-list-item","depth"=>0,"inlineStyleRanges"=>[],"entityRanges"=>[],"data"=>%{}}]}}]
       """
 
-      defp group_list_items(block, acc) do
+      def group_list_items(block, acc) do
         case block["type"] do
           type when type in ["unordered-list-item", "ordered-list-item"] ->
             list_type = String.replace(block["type"], "-item", "")
