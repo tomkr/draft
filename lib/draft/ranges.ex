@@ -15,9 +15,10 @@ defmodule Draft.Ranges do
         |> DraftTree.process_tree(fn text, styles, key ->
           cond do
             !is_nil(styles) ->
-              css = styles
-              |> Enum.map(fn style -> process_style(style, context) end)
-              |> Enum.join(" ")
+              css =
+                styles
+                |> Enum.map(fn style -> process_style(style, context) end)
+                |> Enum.join(" ")
 
               "<span style=\"#{css}\">#{text}</span>"
 
@@ -38,7 +39,11 @@ defmodule Draft.Ranges do
         "font-style: italic;"
       end
 
-      def process_entity(%{"type"=>"LINK","mutability"=>"MUTABLE","data"=>%{"url"=>url}}, text, _) do
+      def process_entity(
+            %{"type" => "LINK", "mutability" => "MUTABLE", "data" => %{"url" => url}},
+            text,
+            _
+          ) do
         "<a href=\"#{url}\">#{text}</a>"
       end
 
@@ -46,9 +51,7 @@ defmodule Draft.Ranges do
         ranges
         |> Enum.group_by(fn range -> {range["offset"], range["length"]} end)
         |> Enum.map(fn {{offset, length}, ranges} ->
-          %{"offset" => offset,
-            "length" => length,
-            "styles" => ranges |> Enum.map(&(&1["style"]))}
+          %{"offset" => offset, "length" => length, "styles" => ranges |> Enum.map(& &1["style"])}
         end)
       end
 
@@ -64,13 +67,19 @@ defmodule Draft.Ranges do
           |> Enum.reduce([style_range], fn point, acc ->
             {already_split, [main]} = Enum.split(acc, length(acc) - 1)
 
-            already_split ++ [
-              %{"style" => style_range["style"],
-                "offset" => main["offset"],
-                "length" => point - main["offset"]},
-              %{"style" => style_range["style"],
-                "offset" => point,
-                "length" => main["length"] - (point - main["offset"])}]
+            already_split ++
+              [
+                %{
+                  "style" => style_range["style"],
+                  "offset" => main["offset"],
+                  "length" => point - main["offset"]
+                },
+                %{
+                  "style" => style_range["style"],
+                  "offset" => point,
+                  "length" => main["length"] - (point - main["offset"])
+                }
+              ]
           end)
         end)
         |> List.flatten()
@@ -82,8 +91,10 @@ defmodule Draft.Ranges do
           cond do
             range1["offset"] != range2["offset"] ->
               range1["offset"] < range2["offset"]
+
             range1["length"] != range2["length"] ->
               range1["length"] >= range2["length"]
+
             true ->
               is_nil(range2["styles"])
           end
@@ -94,8 +105,8 @@ defmodule Draft.Ranges do
         Enum.reduce(ranges, [], fn range, acc ->
           acc ++ [range["offset"], range["offset"] + range["length"]]
         end)
-        |> Enum.uniq
-        |> Enum.sort
+        |> Enum.uniq()
+        |> Enum.sort()
       end
     end
   end
