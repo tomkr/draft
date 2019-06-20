@@ -64,7 +64,10 @@ defmodule Draft.Block do
         %{
           "one" => "h1",
           "two" => "h2",
-          "three" => "h3"
+          "three" => "h3",
+          "four" => "h4",
+          "five" => "h5",
+          "six" => "h6"
         }
       end
     end
