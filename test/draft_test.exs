@@ -82,6 +82,66 @@ defmodule DraftTest do
     assert to_html(input) == output
   end
 
+  test "generate a <h4>" do
+    input = %{
+      "entityMap" => %{},
+      "blocks" => [
+        %{
+          "key" => "9d21d",
+          "text" => "Hello",
+          "type" => "header-four",
+          "depth" => 0,
+          "inlineStyleRanges" => [],
+          "entityRanges" => [],
+          "data" => %{}
+        }
+      ]
+    }
+
+    output = "<h4>Hello</h4>"
+    assert to_html(input) == output
+  end
+
+  test "generate a <h5>" do
+    input = %{
+      "entityMap" => %{},
+      "blocks" => [
+        %{
+          "key" => "9d21d",
+          "text" => "Hello",
+          "type" => "header-five",
+          "depth" => 0,
+          "inlineStyleRanges" => [],
+          "entityRanges" => [],
+          "data" => %{}
+        }
+      ]
+    }
+
+    output = "<h5>Hello</h5>"
+    assert to_html(input) == output
+  end
+
+  test "generate a <h6>" do
+    input = %{
+      "entityMap" => %{},
+      "blocks" => [
+        %{
+          "key" => "9d21d",
+          "text" => "Hello",
+          "type" => "header-six",
+          "depth" => 0,
+          "inlineStyleRanges" => [],
+          "entityRanges" => [],
+          "data" => %{}
+        }
+      ]
+    }
+
+    output = "<h6>Hello</h6>"
+    assert to_html(input) == output
+  end
+
   test "generate a <blockquote>" do
     input = %{
       "entityMap" => %{},
