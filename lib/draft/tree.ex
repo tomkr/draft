@@ -57,7 +57,6 @@ defmodule DraftTree do
           key: key,
           styles: styles,
           offset: offset,
-          length: length,
           text: text
         },
         processor
