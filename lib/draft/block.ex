@@ -49,7 +49,7 @@ defmodule Draft.Block do
             entity_map,
             context
           ) do
-        "<li>#{apply_ranges(block, entity_map, context)}</li>"
+        "<li style=\"mso-special-format:numbullet;\">#{apply_ranges(block, entity_map, context)}</li>"
       end
 
       def process_block(
@@ -57,7 +57,7 @@ defmodule Draft.Block do
             entity_map,
             context
           ) do
-        "<li>#{apply_ranges(block, entity_map, context)}</li>"
+        "<li style=\"mso-special-format:bullet;\">#{apply_ranges(block, entity_map, context)}</li>"
       end
 
       def header_tags do
