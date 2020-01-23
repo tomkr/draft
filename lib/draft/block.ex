@@ -33,7 +33,7 @@ defmodule Draft.Block do
             entity_map,
             context
           ) do
-        "<ul>#{Enum.map(children, &process_block(&1, entity_map, context)) |> Enum.join("")}</ul>"
+        "<ul>#{Enum.map(children, &process_block(&1, entity_map, context)) |> Enum.join("\n")}</ul>"
       end
 
       def process_block(
@@ -41,7 +41,7 @@ defmodule Draft.Block do
             entity_map,
             context
           ) do
-        "<ol>#{Enum.map(children, &process_block(&1, entity_map, context)) |> Enum.join("")}</ol>"
+        "<ol>#{Enum.map(children, &process_block(&1, entity_map, context)) |> Enum.join("\n")}</ol>"
       end
 
       def process_block(
