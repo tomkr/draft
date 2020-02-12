@@ -39,6 +39,10 @@ defmodule Draft.Ranges do
         "font-style: italic;"
       end
 
+      def process_style("UNDERLINE", _) do
+        "text-decoration: underline;"
+      end
+
       def process_entity(
             %{"type" => "LINK", "mutability" => "MUTABLE", "data" => %{"url" => url}},
             text,
