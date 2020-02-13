@@ -210,7 +210,8 @@ defmodule DraftTest do
           "text" => "Hello World!",
           "inlineStyleRanges" => [
             %{"style" => "ITALIC", "offset" => 8, "length" => 3},
-            %{"style" => "BOLD", "offset" => 2, "length" => 2}
+            %{"style" => "BOLD", "offset" => 2, "length" => 2},
+            %{"style" => "UNDERLINE", "offset" => 4, "length" => 4}
           ],
           "type" => "unstyled",
           "depth" => 0,
@@ -222,7 +223,7 @@ defmodule DraftTest do
     }
 
     output =
-      "<p>He<span style=\"font-weight: bold;\">ll</span>o Wo<span style=\"font-style: italic;\">rld</span>!</p>"
+      "<p>He<span style=\"font-weight: bold;\">ll</span><span style=\"text-decoration: underline;\">o Wo</span><span style=\"font-style: italic;\">rld</span>!</p>"
 
     assert to_html(input) == output
   end
@@ -354,7 +355,7 @@ defmodule DraftTest do
       ]
     }
 
-    output = "<ol><li>one</li></ol>"
+    output = "<ol><li style=\"mso-special-format:numbullet;\">one</li></ol>"
     assert to_html(input) == output
   end
 
@@ -374,7 +375,7 @@ defmodule DraftTest do
       ]
     }
 
-    output = "<ul><li>one</li></ul>"
+    output = "<ul><li style=\"mso-special-format:bullet;\">one</li></ul>"
     assert to_html(input) == output
   end
 
@@ -403,7 +404,9 @@ defmodule DraftTest do
       ]
     }
 
-    output = "<ul><li>one</li><li>two</li></ul>"
+    output =
+      "<ul><li style=\"mso-special-format:bullet;\">one</li><li style=\"mso-special-format:bullet;\">two</li></ul>"
+
     assert to_html(input) == output
   end
 
@@ -460,7 +463,7 @@ defmodule DraftTest do
     }
 
     output =
-      "<ul><li>one</li></ul><ol><li>whoops</li></ol><ul><li>two</li></ul><p>Hello</p><ol><li>and another</li></ol>"
+      "<ul><li style=\"mso-special-format:bullet;\">one</li></ul><ol><li style=\"mso-special-format:numbullet;\">whoops</li></ol><ul><li style=\"mso-special-format:bullet;\">two</li></ul><p>Hello</p><ol><li style=\"mso-special-format:numbullet;\">and another</li></ol>"
 
     assert to_html(input) == output
   end

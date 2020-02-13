@@ -20,7 +20,7 @@ defmodule Draft.Ranges do
                 |> Enum.map(fn style -> process_style(style, context) end)
                 |> Enum.join(" ")
 
-              "<span \n style=\"#{css}\">#{text}</span>"
+              "<span style=\"#{css}\">#{text}</span>"
 
             !is_nil(key) ->
               process_entity(entity_map |> Map.get(Integer.to_string(key)), text, context)
@@ -37,6 +37,10 @@ defmodule Draft.Ranges do
 
       def process_style("ITALIC", _) do
         "font-style: italic;"
+      end
+
+      def process_style("UNDERLINE", _) do
+        "text-decoration: underline;"
       end
 
       def process_entity(
