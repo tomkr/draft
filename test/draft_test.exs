@@ -354,7 +354,7 @@ defmodule DraftTest do
       ]
     }
 
-    output = "<ol><li>one</li></ol>"
+    output = "<ol><li style=\"mso-special-format:numbullet;\">one</li></ol>"
     assert to_html(input) == output
   end
 
@@ -374,7 +374,7 @@ defmodule DraftTest do
       ]
     }
 
-    output = "<ul><li>one</li></ul>"
+    output = "<ul><li style=\"mso-special-format:bullet;\">one</li></ul>"
     assert to_html(input) == output
   end
 
@@ -403,7 +403,9 @@ defmodule DraftTest do
       ]
     }
 
-    output = "<ul><li>one</li><li>two</li></ul>"
+    output =
+      "<ul><li style=\"mso-special-format:bullet;\">one</li><li style=\"mso-special-format:bullet;\">two</li></ul>"
+
     assert to_html(input) == output
   end
 
@@ -460,7 +462,7 @@ defmodule DraftTest do
     }
 
     output =
-      "<ul><li>one</li></ul><ol><li>whoops</li></ol><ul><li>two</li></ul><p>Hello</p><ol><li>and another</li></ol>"
+      "<ul><li style=\"mso-special-format:bullet;\">one</li></ul><ol><li style=\"mso-special-format:numbullet;\">whoops</li></ol><ul><li style=\"mso-special-format:bullet;\">two</li></ul><p>Hello</p><ol><li style=\"mso-special-format:numbullet;\">and another</li></ol>"
 
     assert to_html(input) == output
   end
