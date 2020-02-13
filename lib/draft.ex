@@ -23,7 +23,7 @@ defmodule Draft do
         |> Map.get("blocks")
         |> Enum.reduce([], &group_list_items/2)
         |> Enum.map(&process_block(&1, entity_map, context))
-        |> Enum.join("\n")
+        |> Enum.join("")
       end
 
       @doc """
