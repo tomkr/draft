@@ -1,68 +1,75 @@
 defmodule Draft.Block do
-  @moduledoc """
-  Converts a single DraftJS block to html.
-  """
+  defmacro __using__(_) do
+    quote do
+      @moduledoc """
+      Converts a single DraftJS block to html.
+      """
 
-  @doc """
-  Renders the given DraftJS input as html.
+      use Draft.Ranges
 
-  ## Examples
-      iex> block = %{"key" => "1", "text" => "Hello", "type" => "unstyled",
-      ...>   "depth" => 0,  "inlineStyleRanges" => [], "entityRanges" => [],
-      ...>   "data" => %{}}
-      iex> Draft.Block.to_html block
-      "<p>Hello</p>"
-  """
-  def to_html(block) do
-    process_block(block)
-  end
+      def process_block(%{"type" => "unstyled", "text" => ""}, _, _) do
+        "<br>"
+      end
 
-  defp process_block(%{"type" => "unstyled",
-                      "text" => "",
-                      "key" => _,
-                      "data" => _,
-                      "depth" => _,
-                      "entityRanges" => _,
-                      "inlineStyleRanges" => _}) do
-    "<br>"
-  end
+      def process_block(
+            %{"type" => "header-" <> header, "text" => text} = block,
+            entity_map,
+            context
+          ) do
+        tag = header_tags()[header]
+        "<#{tag}>#{apply_ranges(block, entity_map, context)}</#{tag}>"
+      end
 
-  defp process_block(%{"type" => "header-" <> header,
-                      "text" => text,
-                      "key" => _,
-                      "data" => _,
-                      "depth" => _,
-                      "entityRanges" => _,
-                      "inlineStyleRanges" => _}) do
-    tag = header_tags[header]
-    "<#{tag}>#{text}</#{tag}>"
-  end
+      def process_block(%{"type" => "blockquote", "text" => text} = block, entity_map, context) do
+        "<blockquote>#{apply_ranges(block, entity_map, context)}</blockquote>"
+      end
 
-  defp process_block(%{"type" => "blockquote",
-                      "text" => text,
-                      "key" => _,
-                      "data" => _,
-                      "depth" => _,
-                      "entityRanges" => _,
-                      "inlineStyleRanges" => _}) do
-    "<blockquote>#{text}</blockquote>"
-  end
+      def process_block(%{"type" => "unstyled", "text" => text} = block, entity_map, context) do
+        "<p>#{apply_ranges(block, entity_map, context)}</p>"
+      end
 
-  defp process_block(%{"type" => "unstyled",
-                      "text" => text,
-                      "key" => _,
-                      "data" => _,
-                      "depth" => _,
-                      "entityRanges" => _,
-                      "inlineStyleRanges" => _}) do
-    "<p>#{text}</p>"
-  end
+      def process_block(
+            %{"type" => "unordered-list", "data" => %{"children" => children}},
+            entity_map,
+            context
+          ) do
+        "<ul>#{Enum.map(children, &process_block(&1, entity_map, context)) |> Enum.join("")}</ul>"
+      end
 
-  defp header_tags do
-    %{
-      "one"   => "h1",
-      "two"   => "h2",
-      "three" => "h3"
-    }
+      def process_block(
+            %{"type" => "ordered-list", "data" => %{"children" => children}},
+            entity_map,
+            context
+          ) do
+        "<ol>#{Enum.map(children, &process_block(&1, entity_map, context)) |> Enum.join("")}</ol>"
+      end
+
+      def process_block(
+            %{"type" => "ordered-list-item", "text" => text} = block,
+            entity_map,
+            context
+          ) do
+        "<li style=\"mso-special-format:numbullet;\">#{apply_ranges(block, entity_map, context)}</li>"
+      end
+
+      def process_block(
+            %{"type" => "unordered-list-item", "text" => text} = block,
+            entity_map,
+            context
+          ) do
+        "<li style=\"mso-special-format:bullet;\">#{apply_ranges(block, entity_map, context)}</li>"
+      end
+
+      def header_tags do
+        %{
+          "one" => "h1",
+          "two" => "h2",
+          "three" => "h3",
+          "four" => "h4",
+          "five" => "h5",
+          "six" => "h6"
+        }
+      end
+    end
   end
 end
