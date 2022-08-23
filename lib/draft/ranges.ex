@@ -10,7 +10,7 @@ defmodule Draft.Ranges do
         |> divvy_style_ranges(block["entityRanges"])
         |> group_style_ranges()
         |> Kernel.++(block["entityRanges"])
-        |> sort_by_offset_and_length_then_styles_first()
+        |> sort_by_offset_and_length_then_styles(entity_map)
         |> DraftTree.build_tree(block["text"])
         |> DraftTree.process_tree(fn text, styles, key ->
           cond do
@@ -41,6 +41,23 @@ defmodule Draft.Ranges do
 
       def process_style("UNDERLINE", _) do
         "text-decoration: underline;"
+      end
+
+      # NB: styling will be processed first
+      # This fixes a bug in Outlook where a `span`'s styling has no effect on the `a` tag.
+      # So instead of `<span style="font-family: Comic Sans MS, sans-serif;"><a href="https="www.google.com">Google</a></span>` we want
+      # `<a href="https="www.google.com"><span style="font-family: Comic Sans MS, sans-serif;">Google</span></a>`
+      def process_style_order(range, %{
+            "type" => "LINK",
+            "mutability" => "MUTABLE",
+            "data" => _data
+          }) do
+        !is_nil(range["styles"])
+      end
+
+      # NB: styling will be processed last
+      def process_style_order(range, _entity) do
+        is_nil(range["styles"])
       end
 
       def process_entity(
@@ -89,7 +106,7 @@ defmodule Draft.Ranges do
         |> List.flatten()
       end
 
-      defp sort_by_offset_and_length_then_styles_first(ranges) do
+      defp sort_by_offset_and_length_then_styles(ranges, entity_map) do
         ranges
         |> Enum.sort(fn range1, range2 ->
           cond do
@@ -100,7 +117,15 @@ defmodule Draft.Ranges do
               range1["length"] >= range2["length"]
 
             true ->
-              is_nil(range2["styles"])
+              key =
+                case range2["key"] do
+                  nil -> nil
+                  key -> Integer.to_string(key)
+                end
+
+              entity = Map.get(entity_map, key)
+
+              process_style_order(range2, entity)
           end
         end)
       end
