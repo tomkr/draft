@@ -339,6 +339,49 @@ defmodule DraftTest do
     assert to_html(input) == output
   end
 
+  test "anchor entities text is wrapped by an inline style span tag" do
+    input = %{
+      "blocks" => [
+        %{
+          "depth" => 0,
+          "entityRanges" => [
+            %{
+              "key" => 0,
+              "offset" => 0,
+              "length" => 6
+            }
+          ],
+          "inlineStyleRanges" => [
+            %{
+              "style" => "BOLD",
+              "offset" => 0,
+              "length" => 6
+            }
+          ],
+          "data" => %{},
+          "text" => "Google",
+          "key" => "c2jk5",
+          "type" => "unstyled"
+        }
+      ],
+      "entityMap" => %{
+        "0" => %{
+          "type" => "LINK",
+          "data" => %{
+            "url" => "https=>\/\/www.google.com",
+            "target" => "_blank"
+          },
+          "mutability" => "MUTABLE"
+        }
+      }
+    }
+
+    output =
+      "<p><a href=\"https=>//www.google.com\"><span style=\"font-weight: bold;\">Google</span></a></p>"
+
+    assert to_html(input) == output
+  end
+
   test "wraps ordered lists in <ol>" do
     input = %{
       "entityMap" => %{},
